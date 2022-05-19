@@ -5,7 +5,6 @@ import cors from 'cors'
 //initializations
 const app = express()
 
-
 //settings
 app.set('port', process.env.PORT || 3001)
 
