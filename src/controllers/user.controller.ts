@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { createToken } from "../helpers/helper";
 import User, { IUser } from "../models/User";
 
 export const signUp = async(req: Request, res: Response):Promise<Response> => {
@@ -18,66 +19,41 @@ export const signUp = async(req: Request, res: Response):Promise<Response> => {
   }
   const user = new User({email, password});
   await user.save();
-  return res.status(200).json(user)
-  // user.save((err, user: IUser) => {
-  //   if (err) {
-  //     return res.status(400).json({
-  //       ok: false,
-  //       err
-  //     });
-  //   }
-  //   res.json({
-  //     ok: true,
-  //     user
-  //   });
-  // });
+  return res.status(200).json(user);
 }
 
-export const signIn = (req: Request, res: Response) => {
-  res.json('signIn');
-  // const { email, password } = req.body;
-  // User.findOne({ email }, (err, user: IUser) => {
-  //   if (err) {
-  //     return res.status(500).json({
-  //       ok: false,
-  //       err
-  //     });
-  //   }
-  //   if (!user) {
-  //     return res.status(400).json({
-  //       ok: false,
-  //       err: {
-  //         message: "Usuario o contraseña incorrectos"
-  //       }
-  //     });
-  //   }
-  //   // user.comparePassword(password, (err, isMatch) => {
-  //   //   if (err) {
-  //   //     return res.status(500).json({
-  //   //       ok: false,
-  //   //       err
-  //   //     });
-  //   //   }
-  //   //   if (!isMatch) {
-  //   //     return res.status(400).json({
-  //   //       ok: false,
-  //   //       err: {
-  //   //         message: "Usuario o contraseña incorrectos"
-  //   //       }
-  //   //     });
-  //   //   }
-  //   //   user.generateToken((err, user) => {
-  //   //     if (err) {
-  //   //       return res.status(400).json({
-  //   //         ok: false,
-  //   //         err
-  //   //       });
-  //   //     }
-  //   //     res.json({
-  //   //       ok: true,
-  //   //       user
-  //   //     });
-  //   //   });
-  //   // });
-  // });
+export const signIn = async(req: Request, res: Response) => {
+    const { email, password } = req.body;
+    console.log(email, password);
+
+  if(!email || !password) {
+    return res.status(400).json({
+      ok: false,
+      msg: 'Email and password are required'
+    })
+  }
+ const user = await User.findOne({ email});
+    if (!user) {
+      return res.status(400).json({
+        err: {
+          message: "Usuario doesn't exist. Plz try again"
+        }
+      });
+    }
+
+const isMatch = await user.comparePassword(password)
+
+  if (!isMatch) {
+    return res.status(400).json({
+      err: {
+        message: "Incorrect password"
+      }
+    });
+  }
+  
+  return res.status(200).json({
+    ok: true,
+    token: createToken(user)
+  });
+
 }
