@@ -32,6 +32,7 @@ user.password = hash
 next()
 })
 
+//Método para comparar el password
 userSchema.methods.comparePassword = async function (password: string): Promise<boolean> {
   return await bcrytp.compare(password, this.password)
 }
