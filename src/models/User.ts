@@ -24,12 +24,11 @@ const userSchema = new Schema({
 
 //Método para cifrar el password
 userSchema.pre<IUser>('save', async function (next) {
-  const user = this
-  if (!user.isModified('password')) return next()
+  if (!this.isModified('password')) return next()
 
 const salt = await bcrytp.genSalt(10);
-const hash = await bcrytp.hash(user.password, salt)
-user.password = hash
+const hash = await bcrytp.hash(this.password, salt)
+this.password = hash
 next()
 })
 
