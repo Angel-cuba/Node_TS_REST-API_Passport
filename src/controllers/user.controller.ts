@@ -11,10 +11,10 @@ export const signUp = async(req: Request, res: Response):Promise<Response> => {
       msg: 'Email and password are required'
     })
   }
-  const userExist = await User.findOne({ email: req.body.email})
+  const userExist = await User.findOne({ email })
   if(userExist) {
     return res.status(400).json({
-      msg: 'User already exists'
+      msg: 'User email already exists'
     })
   }
   const user = new User({email, password});
@@ -24,7 +24,6 @@ export const signUp = async(req: Request, res: Response):Promise<Response> => {
 
 export const signIn = async(req: Request, res: Response) => {
     const { email, password } = req.body;
-    console.log(email, password);
 
   if(!email || !password) {
     return res.status(400).json({
